@@ -1,0 +1,128 @@
+Q2.
+The following steps connect your AWS account to Monitoring:
+
+    1.Create a new GCP project.
+
+    2.Create a new Workspace. 
+
+    3.Identify your trusted account ID and external ID.
+
+    4.Create an AWS role using the Account ID and External ID.
+
+    5.Connect your Workspace and AWS account using the AWS Role to create a new AWS connector project.
+
+    6.Create a service account in the AWS connector project to authorize access to GCP.
+-------------------------------------------------------------------------
+1. Create a new GCP project
+    In the GCP Console,Create a New Project
+
+    In the Project Name field, enter Quickstart.
+
+    Click Create.
+
+2. Create a new Workspace
+	Go to the GCP Console:
+
+	In the menu bar, click the drop-down list next to the Google Cloud Platform and select your GCP project.
+
+	Click Monitoring.
+
+	create a new Workspace by selecting your GCP project under New Workspace and then clicking Add.
+
+3.  Identify your trusted account ID and external ID.
+    Go to the Stackdriver Monitoring console:
+
+    select Quickstart.
+
+    At the bottom of the Workspace menu, click Workspace Settings.
+
+    Under Settings, click Monitored accounts.
+
+    Click Add AWS account.
+
+    Record the Account ID and External ID. You need this data to create your AWS Role.
+
+4. Create an AWS role using the Account ID and External ID.
+    
+    Log into your AWS IAM console and click Roles in the left-side menu.
+
+    Click Create New Role and do the following:
+        Role type- AWS account.
+        In the Account ID field, enter the account ID provided by Stackdriver.
+        Select the Require external ID checkbox.
+        In the External ID field, enter the external ID provided by Stackdriver.
+        Don't select Require MFA.
+        Click Next: Permissions.
+
+    From the Policy name drop-down list, select ReadOnlyAccess:
+
+    Click Next: Review and fill in or verify the following information:
+        In the Role name field, enter a name 
+        In the Role description field, enter anything you wish.
+        In the Trusted entities field, verify it's the Account ID you entered earlier.
+        In the Policies field, verify the value is ReadOnlyAccess.
+
+    In the AWS IAM page, click Create Role.
+ 
+5. Connect your Workspace and AWS account using the AWS Role to create a new AWS connector project.
+
+    Go to the Stackdriver Monitoring console.
+
+    From the Workspace menu at the top of the page, select your Workspace. 
+
+    At the bottom of the Workspace menu, click Workspace Settings.
+
+    Under Settings, click Monitored accounts. 
+
+    Stackdriver monitored accounts
+
+    Click Add AWS account. Enter the Account ID and External ID from when you created a Workspace.
+
+    Enter the following information in the form:
+        In the Role ARN field, enter your Role ARN from Creating an AWS role or follow the instructions on the Add AWS account page to create the role.
+
+    Click Add AWS account. In a moment, the connection is confirmed.
+
+    AWS connector projects
+
+    Your AWS account description [YOUR_AWS_ACCOUNT_NUMBER]
+    Connected to [CONNECTOR_PROJECT_ID]
+
+6. CReate Service Account
+
+    To create the service account, go to the IAM & Admin > Service accounts page for your connector project:
+
+    Select the AWS connector project.
+
+    Click Create service account and enter the following information:
+        In the Service account name field, enter Stackdriver agent authorization.
+
+        In the Role field, add both of the following values:
+            Monitoring > Monitoring Metric Writer
+            Logging > Logs Writer
+
+        Select the Furnish a new private key checkbox.
+
+        For Key type, click JSON.
+
+        Clear the Enable G Suite Domain-wide Delegation checkbox.
+
+        Click Create. The service account's private-key file is downloaded to your workstation with a name such as Downloads/[PROJECT_NAME]-[KEY_ID].json.
+
+    CREDS="Downloads/[PROJECT_NAME]-[KEY_ID].json"
+
+7. Add a service account to a VM instance
+
+    KEY="/path/to/key.pem"
+    scp -i "$KEY" "$CREDS" AWS_USERNAME@AWS_HOSTNAME:temp.json
+
+    GOOGLE_APPLICATION_CREDENTIALS="/etc/google/auth/application_default_credentials.json"
+    sudo mkdir -p $(dirname "$GOOGLE_APPLICATION_CREDENTIALS")
+    sudo mv "$HOME/temp.json" "$GOOGLE_APPLICATION_CREDENTIALS"
+
+
+
+
+
+
+   
